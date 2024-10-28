@@ -10,7 +10,6 @@ const router = express.Router();
 
 // create or update talent profile
 router.post('/', auth, async (req, res) => {
-    console.log('update', req)
     const { skills, experience, location, portfolio, mobile_number, country, state, dob, job_category,
         about,
         job_experience_id,
@@ -23,6 +22,7 @@ router.post('/', auth, async (req, res) => {
         onboarding_step,
         resume,
         profile_picture,
+        onboarding_complete
     } = req.body;
     try {
 
@@ -50,11 +50,7 @@ router.post('/', auth, async (req, res) => {
         if (onboarding_step) updateFields.onboarding_step = onboarding_step
         if (resume) updateFields.resume = resume
         if (profile_picture) updateFields.profile_picture = profile_picture
-
-
-        console.log({talent})
-        console.log({user})
-        console.log({updateFields})
+        if (onboarding_complete) updateFields.onboarding_complete = onboarding_complete
 
         if (talent) {
             talent = await Talent.findOneAndUpdate(
@@ -108,20 +104,48 @@ router.get('/:id', async (req, res) => {
     }
 })
 
-// get all talents 
+// get paginated talents 
 router.get('/', async (req, res) => {
     try {
-        const talents = await Talent.find().populate('user', ['name', 'email']);
-        res.json({
-            status: true,
-            messaged: 'Talents fetched successfully',
-            data: talents
-        })
+      const { page = 1, limit = 10 } = req.query; // Default to page 1, 10 items per page
+      const total = await Talent.countDocuments();
+      // Calculate the number of documents to skip
+      const skip = (page - 1) * limit;
 
+      if (skip >= total)  return res.json({
+          status: true,
+          message: 'You’ve reached the end of this talent list.',
+          data: [],
+          pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+          },
+        });
+  
+      // Fetch paginated results with population
+      const talents = await Talent.find()
+        .populate('user', ['first_name', 'last_name','email'])
+        .skip(skip)
+        .limit(parseInt(limit));
+    
+  
+      res.json({
+        status: true,
+        message: 'Talents fetched successfully',
+        data: talents,
+        pagination: {
+          total, // Total number of talents
+          page: parseInt(page), // Current page number
+          limit: parseInt(limit), // Number of items per page
+          totalPages: Math.ceil(total / limit), // Total number of pages
+        },
+      });
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error')
+      console.error(err.message);
+      res.status(500).send('Server error');
     }
-})
+  });
 
 export default router;

@@ -28,6 +28,7 @@ const talentSchema = mongoose.Schema({
     job_industries: [String],
     job_career_level_id: Number,
     onboarding_step: Number,
+    onboarding_complete: Boolean,
     resume: String,
     profile_picture: String
 })

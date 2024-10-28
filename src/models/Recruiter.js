@@ -33,6 +33,8 @@ const recruiterSchema = mongoose.Schema({
     linkedin_link: String,
     job_industries: [String],
     location: String,
+    onboarding_complete: Boolean,
+    organization_id: String
 })
 
 const Recruiter = mongoose.model('Recruiter', recruiterSchema);

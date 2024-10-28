@@ -13,8 +13,11 @@ router.post('/update-recruiter', auth, async (req, res) => {
         state,
         organization,
         work_preference,
-        contract_type,
+        contract_types,
         scope_attachment,
+        onboarding_complete,
+        organization_id,
+        scope
     } = req.body
 
 
@@ -27,10 +30,11 @@ router.post('/update-recruiter', auth, async (req, res) => {
         if (state) updateFields.state = state;
         if (organization) updateFields.organization = organization;
         if (work_preference) updateFields.work_preference = work_preference;
-        if (contract_type) updateFields.contract_type = contract_type;
+        if (contract_types) updateFields.contract_types = contract_types;
         if (scope_attachment) updateFields.scope_attachment = scope_attachment;
-
-        console.log({updateFields})
+        if (scope) updateFields.scope = scope;
+        if (onboarding_complete) updateFields.onboarding_complete = onboarding_complete;
+        if (organization_id) updateFields.organization_id = organization_id;
 
         if (recruiter) {
             recruiter = await Recruiter.findOneAndUpdate(
@@ -41,7 +45,7 @@ router.post('/update-recruiter', auth, async (req, res) => {
             return res.json({
                 status: true,
                 data: recruiter,
-                message: 'Recruiter profile updated successfully'
+                message: 'Profile updated successfully'
             })
         }
 
@@ -53,7 +57,7 @@ router.post('/update-recruiter', auth, async (req, res) => {
         await recruiter.save()
         res.json({
             status: true,
-            message: 'Recruiter profile created successfully',
+            message: 'Profile created successfully',
             data: recruiter
         })
 
