@@ -27,7 +27,7 @@ router.post('/', auth, async (req, res) => {
     try {
 
         let talent = await Talent.findOne({ user: req.user.id });
-        const user = await User.findById(req.user.id);
+        console.log({talent, id: req.user.id})
 
         const updateFields = {};
         if (skills) updateFields.skills = skills;
